@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Notas · {{ student_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --color-espresso: #21160f;
+            --color-cocoa: #4a3027;
+            --color-mocha: #7d5f4b;
+            --color-taupe: #9c8770;
+            --color-sand: #c9b9a3;
+            --color-linen: #e4dcd1;
+            --color-cream: #f4efe8;
+            --color-paper: #fbf8f4;
+            --color-gold: #d6a85c;
+            --color-clay: #d4917e;
+            --color-brick: #9b3b2f;
+            --color-ochre: #8b5a1f;
+            --color-sage: #5f6b46;
+            --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+            --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        body {
+            min-height: 100dvh;
+            font-family: var(--font-sans);
+            background-color: var(--color-linen);
+            background-image:
+                radial-gradient(60rem 30rem at 50% -10%, rgba(251, 248, 244, 0.75), transparent),
+                radial-gradient(40rem 24rem at 100% 100%, rgba(201, 185, 163, 0.45), transparent);
+            color: var(--color-espresso);
+            -webkit-font-smoothing: antialiased;
+            padding: 2.25rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 760px;
+            animation: fade-in 0.4s ease-out both;
+        }
+
+        .topbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, var(--color-mocha), var(--color-cocoa));
+            color: var(--color-cream);
+            box-shadow: 0 10px 15px -3px rgba(74, 48, 39, 0.25);
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            display: block;
+            font-family: var(--font-serif);
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--color-espresso);
+        }
+
+        .brand-tagline {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--color-mocha);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .status-ok {
+            border: 1px solid rgba(95, 107, 70, 0.35);
+            background: rgba(95, 107, 70, 0.12);
+            color: var(--color-espresso);
+        }
+
+        .status-err {
+            border: 1px solid rgba(155, 59, 47, 0.35);
+            background: rgba(155, 59, 47, 0.12);
+            color: var(--color-brick);
+        }
+
+        .dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 9999px;
+        }
+
+        .dot-ok { background: var(--color-sage); }
+        .dot-err { background: var(--color-brick); }
+
+        .card {
+            border-radius: 1.5rem;
+            border: 1px solid rgba(201, 185, 163, 0.7);
+            background: rgba(244, 239, 232, 0.9);
+            padding: 1.75rem;
+            box-shadow: 0 20px 25px -5px rgba(74, 48, 39, 0.1), 0 8px 10px -6px rgba(74, 48, 39, 0.1);
+            backdrop-filter: blur(8px);
+            margin-bottom: 1.35rem;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-espresso);
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-espresso);
+        }
+
+        .subtitle {
+            margin-top: 0.35rem;
+            color: var(--color-mocha);
+            font-size: 0.95rem;
+        }
+
+        .db-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            padding-top: 1.15rem;
+            border-top: 1px solid rgba(201, 185, 163, 0.7);
+        }
+
+        .meta-box {
+            background: rgba(251, 248, 244, 0.75);
+            border: 1px solid rgba(201, 185, 163, 0.8);
+            border-radius: 0.85rem;
+            padding: 0.7rem 0.9rem;
+        }
+
+        .meta-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--color-mocha);
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            color: var(--color-espresso);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        input[type="text"], select {
+            border-radius: 0.75rem;
+            border: 1px solid var(--color-taupe);
+            background: var(--color-paper);
+            color: var(--color-espresso);
+            padding: 0.65rem 0.9rem;
+            font-size: 0.94rem;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        input[type="text"] { flex: 1 1 260px; }
+        input[type="text"]::placeholder { color: rgba(125, 95, 75, 0.6); }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--color-cocoa);
+            box-shadow: 0 0 0 4px rgba(125, 95, 75, 0.15);
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 0.75rem;
+            background: var(--color-cocoa);
+            color: var(--color-cream);
+            padding: 0.65rem 1.25rem;
+            font-size: 0.94rem;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(74, 48, 39, 0.2);
+        }
+
+        .btn-primary:hover { background: var(--color-espresso); }
+
+        .list-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-bar {
+            color: var(--color-mocha);
+            font-size: 0.85rem;
+        }
+
+        .stats-bar strong { color: var(--color-espresso); }
+
+        .note-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .note-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.85rem;
+            background: rgba(251, 248, 244, 0.8);
+            border: 1px solid rgba(201, 185, 163, 0.85);
+            border-radius: 1rem;
+            padding: 0.9rem 1rem;
+        }
+
+        .note-item.done { opacity: 0.65; }
+
+        .note-dot {
+            width: 0.6rem;
+            height: 0.6rem;
+            border-radius: 9999px;
+            background: var(--color-gold);
+            flex-shrink: 0;
+        }
+
+        .note-item.done .note-dot { background: var(--color-sage); }
+
+        .note-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .note-title {
+            font-size: 0.98rem;
+            font-weight: 500;
+            color: var(--color-espresso);
+            word-break: break-word;
+        }
+
+        .note-item.done .note-title {
+            text-decoration: line-through;
+            color: var(--color-mocha);
+        }
+
+        .note-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.3rem;
+            font-size: 0.78rem;
+            color: var(--color-mocha);
+        }
+
+        .chip {
+            background: rgba(201, 185, 163, 0.4);
+            border: 1px solid var(--color-sand);
+            color: var(--color-cocoa);
+            padding: 0.1rem 0.55rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.45rem;
+            flex-shrink: 0;
+        }
+
+        .btn-sm {
+            border-radius: 0.65rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .btn-toggle {
+            border: 1px solid rgba(95, 107, 70, 0.45);
+            background: rgba(95, 107, 70, 0.1);
+            color: var(--color-sage);
+        }
+
+        .btn-toggle:hover { background: rgba(95, 107, 70, 0.18); }
+
+        .btn-delete {
+            border: 1px solid rgba(155, 59, 47, 0.4);
+            background: rgba(155, 59, 47, 0.08);
+            color: var(--color-brick);
+        }
+
+        .btn-delete:hover { background: rgba(155, 59, 47, 0.16); }
+
+        .empty {
+            text-align: center;
+            color: var(--color-mocha);
+            padding: 1.5rem 0.5rem;
+            font-size: 0.93rem;
+        }
+
+        .error-box {
+            border: 1px solid rgba(155, 59, 47, 0.35);
+            background: rgba(155, 59, 47, 0.1);
+            color: var(--color-espresso);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.88rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--color-mocha);
+            font-size: 0.84rem;
+            margin-top: 0.5rem;
+        }
+
+        .footer strong { color: var(--color-cocoa); }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-icon" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                    </svg>
+                </span>
+                <span>
+                    <span class="brand-title">Bitácora de Notas</span>
+                    <span class="brand-tagline">Docker Compose · Flask + PostgreSQL</span>
+                </span>
+            </div>
+
+            {% if db_connected %}
+                <span class="status-pill status-ok">
+                    <span class="dot dot-ok" aria-hidden="true"></span>
+                    Base de datos conectada
+                </span>
+            {% else %}
+                <span class="status-pill status-err">
+                    <span class="dot dot-err" aria-hidden="true"></span>
+                    Base de datos desconectada
+                </span>
+            {% endif %}
+        </header>
+
+        <section class="card">
+            <h1>Hola, {{ student_name.split()[0] }}</h1>
+            <p class="subtitle">Servicio web contenedorizado con red privada y persistencia en volumen.</p>
+
+            <div class="db-meta">
+                <div class="meta-box">
+                    <span class="meta-label">Estudiante</span>
+                    <span class="meta-value">{{ student_name }}</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">Host Interno</span>
+                    <span class="meta-value">{{ db_host }}:5432</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">Base de Datos</span>
+                    <span class="meta-value">{{ db_name }}</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">Motor</span>
+                    <span class="meta-value">{{ pg_version }}</span>
+                </div>
+            </div>
+        </section>
+
+        {% if error_message %}
+        <div class="error-box" role="alert">
+            <strong>Error de conexión con PostgreSQL:</strong> {{ error_message }}
+        </div>
+        {% endif %}
+
+        <section class="card">
+            <h2>Nueva nota</h2>
+            <form action="{{ url_for('create_note') }}" method="POST" class="form-row">
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="Escribe una nota o tarea (ej. Verificar volumen persistente)..."
+                    maxlength="200"
+                    required
+                >
+                <select name="category" aria-label="Categoría">
+                    {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-primary">Guardar nota</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="list-header">
+                <h2>Registro de notas</h2>
+                <div class="stats-bar">
+                    Total: <strong>{{ total_count }}</strong> ·
+                    Pendientes: <strong>{{ pending_count }}</strong> ·
+                    Completadas: <strong>{{ done_count }}</strong>
+                </div>
+            </div>
+
+            {% if notes %}
+            <ul class="note-list">
+                {% for note in notes %}
+                <li class="note-item {% if note.is_done %}done{% endif %}">
+                    <span class="note-dot" aria-hidden="true"></span>
+                    <div class="note-main">
+                        <div class="note-title">{{ note.title }}</div>
+                        <div class="note-info">
+                            <span class="chip">{{ note.category }}</span>
+                            <span>#{{ note.id }}</span>
+                            <span>{{ note.created_label }}</span>
+                        </div>
+                    </div>
+                    <div class="note-actions">
+                        <form action="{{ url_for('toggle_note', note_id=note.id) }}" method="POST">
+                            <button type="submit" class="btn-sm btn-toggle">
+                                {% if note.is_done %}Reabrir{% else %}Completar{% endif %}
+                            </button>
+                        </form>
+                        <form action="{{ url_for('delete_note', note_id=note.id) }}" method="POST">
+                            <button type="submit" class="btn-sm btn-delete">Eliminar</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty">Aún no hay notas registradas. Agrega una arriba para comprobar la base de datos.</p>
+            {% endif %}
+        </section>
+
+        <p class="footer">
+            Desarrollado por <strong>{{ student_name }}</strong> · Tendencias Actuales de Programación (Yavirac)
+        </p>
+    </main>
+</body>
+</html>
